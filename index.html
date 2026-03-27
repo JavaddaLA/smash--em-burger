@@ -326,19 +326,23 @@
       box-shadow: 0 10px 36px rgba(255,210,0,0.1);
     }
     .card-img {
-      height: 200px;
-      overflow: hidden;
+      height: 220px;
       background: #161616;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow: hidden;
     }
     .card-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
       display: block;
       transition: transform 0.4s ease;
     }
     .menu-card:hover .card-img img {
-      transform: scale(1.05);
+      transform: scale(1.06);
     }
     .card-body { padding: 20px; }
     .card-body h3 {
@@ -667,7 +671,7 @@
       <div class="menu-grid">
 
         <div class="menu-card">
-          <div class="card-img"><img src="Products/The Classic Smash.png" alt="The Classic Smash" /></div>
+          <div class="card-img"><img src="Products/The Classic Smash.webp" alt="The Classic Smash" /></div>
           <div class="card-body">
             <h3>The Classic Smash</h3>
             <p>One smashed patty, American cheese, on a toasted brioche bun.</p>
@@ -679,7 +683,7 @@
         </div>
 
         <div class="menu-card">
-          <div class="card-img"><img src="Products/Double Stack.png" alt="The Double Stack" /></div>
+          <div class="card-img"><img src="Products/Double Stack.webp" alt="The Double Stack" /></div>
           <div class="card-body">
             <h3>The Double Stack</h3>
             <p>Two smashed patties, double American cheese, on a toasted brioche bun.</p>
@@ -691,7 +695,7 @@
         </div>
 
         <div class="menu-card">
-          <div class="card-img"><img src="Products/Triple Stack.png" alt="The Triple Stack" /></div>
+          <div class="card-img"><img src="Products/Triple Stack.webp" alt="The Triple Stack" /></div>
           <div class="card-body">
             <h3>The Triple Stack</h3>
             <p>Three smashed patties, triple American cheese, on a toasted brioche bun.</p>
@@ -703,7 +707,7 @@
         </div>
 
         <div class="menu-card">
-          <div class="card-img"><img src="Products/Loaded fries.png" alt="Loaded Fries" /></div>
+          <div class="card-img"><img src="Products/Loaded fries.webp" alt="Loaded Fries" /></div>
           <div class="card-body">
             <h3>Loaded Fries</h3>
             <p>Crispy fries topped with grilled onions, melted cheese, and our house sauce.</p>
