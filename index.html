@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smash 'em Burgers</title>
+  <link rel="icon" type="image/png" href="Logo.PNG" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Pacifico&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --yellow: #FFD200;
+      --red:    #E31010;
+      --black:  #0a0a0a;
+      --dark:   #111111;
+      --gray:   #1e1e1e;
+      --text:   #f0f0f0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'Open Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* custom scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--yellow); }
+
+    /* ── NEON HELPERS ── */
+    .neon-yellow {
+      color: var(--yellow);
+      text-shadow: 0 0 6px var(--yellow), 0 0 20px var(--yellow), 0 0 40px #ffb300;
+    }
+    .neon-red {
+      color: var(--red);
+      text-shadow: 0 0 6px var(--red), 0 0 20px var(--red), 0 0 40px #a00;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 40px;
+      background: rgba(0,0,0,0);
+      backdrop-filter: blur(0px);
+      border-bottom: 1px solid rgba(255,255,255,0);
+      transition: background 0.4s, backdrop-filter 0.4s, border-color 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(12px);
+      border-bottom-color: rgba(255,255,255,0.07);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 12px; }
+    .nav-logo img { height: 44px; width: 44px; object-fit: contain; }
+    .nav-logo span { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 2px; }
+    .nav-logo span em { font-style: italic; font-family: 'Pacifico', cursive; font-size: 1.25rem; }
+    nav ul { list-style: none; display: flex; gap: 32px; }
+    nav ul a {
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    nav ul a:hover { color: var(--yellow); }
+    .nav-cta {
+      background: var(--red) !important;
+      color: #fff !important;
+      padding: 9px 20px;
+      border-radius: 3px;
+      box-shadow: 0 0 14px rgba(227,16,16,0.4);
+    }
+    .nav-cta:hover { box-shadow: 0 0 24px rgba(227,16,16,0.8) !important; }
+
+    /* ── LOADING OVERLAY ── */
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      transition: opacity 0.9s ease, visibility 0.9s ease;
+    }
+    #loading-overlay.done { opacity: 0; visibility: hidden; pointer-events: none; }
+    #loading-logo {
+      width: 80px;
+      filter: drop-shadow(0 0 16px rgba(255,210,0,0.45));
+      animation: pulse-logo 2s ease-in-out infinite;
+    }
+    @keyframes pulse-logo {
+      0%, 100% { opacity: 0.55; transform: scale(0.97); }
+      50%       { opacity: 1;    transform: scale(1); }
+    }
+    #loading-wordmark {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 8px;
+      color: rgba(255,255,255,0.2);
+    }
+    #progress-track {
+      width: 180px;
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    #progress-fill {
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%;
+      width: 0%;
+      background: var(--yellow);
+      box-shadow: 0 0 8px var(--yellow);
+      transition: width 0.15s linear;
+    }
+    #loading-pct {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 4px;
+      color: rgba(255,255,255,0.15);
+    }
+
+    /* ── SEQUENCE SECTION ── */
+    #sequence-section {
+      position: relative;
+      height: 550vh; /* scroll depth — how long the animation takes */
+    }
+
+    #sequence-sticky {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 100vh;
+      background: #000; /* must match image background exactly */
+      overflow: hidden;
+    }
+
+    #seq-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: block;
+    }
+
+    /* ── BEAT TEXT OVERLAYS ── */
+    .beat {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 9%;
+      pointer-events: none;
+      opacity: 0;
+      will-change: opacity, transform;
+    }
+    .beat h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 11vw, 9.5rem);
+      line-height: 0.9;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.93);
+    }
+    .beat h2 .accent-yellow { color: var(--yellow); }
+    .beat h2 .accent-red    { color: var(--red); }
+    .beat-sub {
+      margin-top: 18px;
+      font-size: clamp(0.75rem, 1.6vw, 1rem);
+      color: rgba(255,255,255,0.42);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      max-width: 440px;
+      line-height: 1.9;
+    }
+    .beat-center { align-items: center; text-align: center; padding: 80px 14%; }
+    .beat-center .beat-sub { max-width: 520px; }
+    .beat-left   { align-items: flex-start; }
+    .beat-right  { align-items: flex-end; text-align: right; }
+    .beat-right .beat-sub { margin-left: auto; }
+
+    /* CTA inside last beat */
+    .beat-btn {
+      margin-top: 32px;
+      display: inline-block;
+      padding: 14px 44px;
+      border: 1.5px solid var(--yellow);
+      color: var(--yellow);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: 5px;
+      text-decoration: none;
+      text-transform: uppercase;
+      pointer-events: auto;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+    .beat-btn:hover {
+      background: var(--yellow);
+      color: #000;
+      box-shadow: 0 0 28px rgba(255,210,0,0.5);
+    }
+
+    /* ── SCROLL INDICATOR ── */
+    #scroll-indicator {
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      pointer-events: none;
+      will-change: opacity;
+    }
+    #scroll-indicator span {
+      font-size: 0.58rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.28);
+    }
+    .scroll-line {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, rgba(255,210,0,0.7), transparent);
+      animation: drip 1.8s ease-in-out infinite;
+      transform-origin: top;
+    }
+    @keyframes drip {
+      0%   { transform: scaleY(0); opacity: 0; }
+      40%  { opacity: 1; }
+      100% { transform: scaleY(1); opacity: 0; }
+    }
+
+    /* ── SHARED SECTION STYLES ── */
+    .divider {
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--red), var(--yellow), var(--red), transparent);
+      opacity: 0.3;
+    }
+    section { padding: 96px 24px; }
+    .section-label {
+      font-size: 0.72rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 10px;
+      opacity: 0.8;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      line-height: 1;
+      letter-spacing: 2px;
+      margin-bottom: 48px;
+    }
+    .container { max-width: 1100px; margin: 0 auto; }
+
+    /* ── MENU ── */
+    #menu { background: var(--dark); }
+    .menu-tabs { display: flex; gap: 8px; margin-bottom: 44px; flex-wrap: wrap; }
+    .tab {
+      padding: 8px 22px;
+      border-radius: 3px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: 1px solid #333;
+      background: transparent;
+      color: #666;
+      transition: all 0.2s;
+    }
+    .tab.active, .tab:hover {
+      border-color: var(--yellow);
+      color: var(--yellow);
+      background: rgba(255,210,0,0.06);
+    }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 22px;
+    }
+    .menu-card {
+      background: var(--gray);
+      border: 1px solid #242424;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .menu-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--yellow);
+      box-shadow: 0 10px 36px rgba(255,210,0,0.1);
+    }
+    .card-emoji {
+      font-size: 3.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #161616;
+      padding: 26px;
+    }
+    .card-body { padding: 20px; }
+    .card-body h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .card-body p { font-size: 0.82rem; color: #888; line-height: 1.6; margin-bottom: 14px; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; }
+    .price { font-family: 'Bebas Neue', sans-serif; font-size: 1.45rem; color: var(--yellow); }
+    .badge {
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 3px;
+    }
+    .badge-red    { background: rgba(227,16,16,0.18);  color: var(--red); }
+    .badge-yellow { background: rgba(255,210,0,0.14);  color: var(--yellow); }
+    .badge-white  { background: rgba(255,255,255,0.07); color: #888; }
+
+    /* ── ABOUT ── */
+    #about { background: var(--black); }
+    #about .about-text p { color: #888; line-height: 1.9; margin-bottom: 16px; font-size: 0.94rem; }
+    .about-visual {
+      flex: 1 1 280px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .stat-box {
+      background: var(--gray);
+      border: 1px solid #242424;
+      border-radius: 8px;
+      padding: 28px 20px;
+      text-align: center;
+    }
+    .stat-box .num { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; line-height: 1; }
+    .stat-box .lbl { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #555; margin-top: 6px; }
+
+    /* ── SPECIALS ── */
+    #specials { background: var(--dark); text-align: center; }
+    #specials .section-title { margin-bottom: 10px; }
+    #specials .subtitle { color: #555; font-size: 0.88rem; margin-bottom: 44px; letter-spacing: 1px; }
+    .specials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; text-align: left; }
+    .special-card {
+      border: 1px solid var(--red);
+      border-radius: 8px;
+      padding: 26px;
+      background: rgba(227,16,16,0.03);
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .special-card:hover { box-shadow: 0 0 24px rgba(227,16,16,0.18); }
+    .special-card::before {
+      content: attr(data-day);
+      position: absolute;
+      top: -12px; right: -8px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5rem;
+      color: rgba(227,16,16,0.05);
+      line-height: 1;
+      pointer-events: none;
+    }
+    .special-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; color: var(--red); letter-spacing: 1px; margin-bottom: 8px; }
+    .special-card p { font-size: 0.82rem; color: #777; line-height: 1.65; }
+
+    /* ── LOCATION ── */
+    #location { background: var(--black); }
+    #location .loc-info p { color: #777; font-size: 0.88rem; line-height: 1.9; margin-bottom: 22px; }
+    .hours-table h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.55rem; letter-spacing: 2px; margin-bottom: 18px; color: var(--yellow); }
+    .hours-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1c1c1c; font-size: 0.86rem; }
+    .hours-row .day { color: #666; }
+    .hours-row .time { color: var(--text); font-weight: 600; }
+    .hours-row.today .day, .hours-row.today .time { color: var(--yellow); }
+
+    /* ── CATERING ── */
+    #catering { background: var(--dark); }
+    #catering .section-title { margin-bottom: 10px; }
+    #catering .catering-intro {
+      color: #666;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      margin-bottom: 48px;
+      max-width: 560px;
+    }
+    .catering-wrap {
+      display: flex;
+      gap: 64px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+    .catering-perks {
+      flex: 1 1 240px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .perk {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .perk-icon {
+      font-size: 1.6rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .perk-text h4 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      color: var(--yellow);
+      margin-bottom: 4px;
+    }
+    .perk-text p {
+      font-size: 0.82rem;
+      color: #666;
+      line-height: 1.6;
+    }
+    .catering-form {
+      flex: 2 1 340px;
+      background: var(--gray);
+      border: 1px solid #242424;
+      border-radius: 10px;
+      padding: 36px;
+    }
+    .catering-form h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 2px;
+      margin-bottom: 28px;
+      color: var(--text);
+    }
+    .form-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1 1 200px;
+      margin-bottom: 18px;
+    }
+    .form-group label {
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #555;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: #161616;
+      border: 1px solid #2a2a2a;
+      border-radius: 4px;
+      color: var(--text);
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.88rem;
+      padding: 11px 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      width: 100%;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: #3a3a3a; }
+    .form-group select option { background: #1e1e1e; }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--yellow);
+      box-shadow: 0 0 0 3px rgba(255,210,0,0.08);
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: 4px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      margin-top: 4px;
+    }
+    .form-submit:hover {
+      background: #c00;
+      box-shadow: 0 0 24px rgba(227,16,16,0.55);
+    }
+    .form-note {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.7rem;
+      color: #444;
+      letter-spacing: 1px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #000;
+      border-top: 1px solid #141414;
+      padding: 48px 24px;
+      text-align: center;
+    }
+    footer img { height: 56px; object-fit: contain; margin-bottom: 18px; filter: drop-shadow(0 0 8px rgba(255,210,0,0.25)); }
+    footer p { color: #333; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
+    .footer-links { display: flex; gap: 24px; justify-content: center; margin: 18px 0; flex-wrap: wrap; }
+    .footer-links a { color: #444; text-decoration: none; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--yellow); }
+
+    /* ── BTN ── */
+    .btn {
+      padding: 13px 34px;
+      border-radius: 3px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+      display: inline-block;
+    }
+    .btn-primary { background: var(--red); color: #fff; box-shadow: 0 0 16px rgba(227,16,16,0.45); }
+    .btn-primary:hover { background: #c00; box-shadow: 0 0 28px rgba(227,16,16,0.8); }
+    .btn-outline { background: transparent; color: var(--yellow); border: 1.5px solid var(--yellow); box-shadow: 0 0 8px rgba(255,210,0,0.15); }
+    .btn-outline:hover { background: rgba(255,210,0,0.07); box-shadow: 0 0 20px rgba(255,210,0,0.4); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 680px) {
+      nav ul { display: none; }
+      nav { padding: 14px 20px; }
+      .beat h2 { font-size: clamp(3rem, 14vw, 5rem); }
+      .beat-center { padding: 80px 8%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="main-nav">
+    <div class="nav-logo">
+      <img src="Logo.PNG" alt="Smash 'em Burgers logo" />
+      <span class="neon-red">SMASH'<em class="neon-yellow">em</em></span>
+    </div>
+    <ul>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#specials">Specials</a></li>
+      <li><a href="#location">Find Us</a></li>
+      <li><a href="#catering">Catering</a></li>
+      <li><a href="#catering" class="nav-cta">Contact Us</a></li>
+    </ul>
+  </nav>
+
+  <!-- LOADING OVERLAY -->
+  <div id="loading-overlay">
+    <img id="loading-logo" src="Logo.PNG" alt="Smash 'em" />
+    <div id="loading-wordmark">Smash 'em Burgers</div>
+    <div id="progress-track"><div id="progress-fill"></div></div>
+    <div id="loading-pct">0%</div>
+  </div>
+
+  <!-- ══ SEQUENCE SECTION — 550vh of scroll ══ -->
+  <div id="sequence-section">
+    <div id="sequence-sticky">
+
+      <!-- The canvas — draws one frame per scroll tick -->
+      <canvas id="seq-canvas"></canvas>
+
+      <!-- Beat A: 0–22% — Burger fully spread apart -->
+      <div class="beat beat-center" id="beat-a">
+        <h2>
+          <span class="accent-red">SMASH'</span><span class="accent-yellow">em</span>
+          <br>BURGERS
+        </h2>
+        <p class="beat-sub">The only burger worth flattening</p>
+      </div>
+
+      <!-- Beat B: 28–50% — Layers converging -->
+      <div class="beat beat-left" id="beat-b">
+        <h2>EVERY<br>LAYER<br><span class="accent-yellow">EARNED</span></h2>
+        <p class="beat-sub">Fresh ground beef.<br>Real American cheese.<br>Caramelized onions done right.</p>
+      </div>
+
+      <!-- Beat C: 53–73% — Nearly stacked -->
+      <div class="beat beat-right" id="beat-c">
+        <h2>ZERO<br><span class="accent-red">SHORTCUTS</span></h2>
+        <p class="beat-sub">700° flat-top. Maximum crust.<br>Crispy lacy edges every time.<br>Never frozen. Never fake.</p>
+      </div>
+
+      <!-- Beat D: 78–100% — Fully assembled -->
+      <div class="beat beat-center" id="beat-d">
+        <h2>READY<br>TO <span class="accent-red">SMASH?</span></h2>
+        <p class="beat-sub">Find us on Griddle Lane — open daily</p>
+        <a href="#catering" class="beat-btn">Contact Us</a>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div id="scroll-indicator">
+        <span>Scroll to explore</span>
+        <div class="scroll-line"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- MENU -->
+  <section id="menu">
+    <div class="container">
+      <p class="section-label">What we're slingin'</p>
+      <h2 class="section-title">THE <span class="neon-yellow">MENU</span></h2>
+
+      <div class="menu-grid">
+
+        <div class="menu-card">
+          <div class="card-emoji">🍔</div>
+          <div class="card-body">
+            <h3>The Classic Smash</h3>
+            <p>One smashed patty, American cheese, on a toasted brioche bun.</p>
+            <div class="card-footer">
+              <span class="price">$7.50</span>
+              <span class="badge badge-yellow">Fan Fave</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="menu-card">
+          <div class="card-emoji">🔥</div>
+          <div class="card-body">
+            <h3>The Double Stack</h3>
+            <p>Two smashed patties, double American cheese, on a toasted brioche bun.</p>
+            <div class="card-footer">
+              <span class="price">$10.50</span>
+              <span class="badge badge-red">Best Seller</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="menu-card">
+          <div class="card-emoji">🧀</div>
+          <div class="card-body">
+            <h3>The Triple Stack</h3>
+            <p>Three smashed patties, triple American cheese, on a toasted brioche bun.</p>
+            <div class="card-footer">
+              <span class="price">$13.50</span>
+              <span class="badge badge-red">Go Big</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="menu-card">
+          <div class="card-emoji">🍟</div>
+          <div class="card-body">
+            <h3>Loaded Fries</h3>
+            <p>Crispy fries topped with grilled onions, melted cheese, and our house sauce.</p>
+            <div class="card-footer">
+              <span class="price">$5.50</span>
+              <span class="badge badge-yellow">Must Try</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container" style="display:flex; gap:64px; flex-wrap:wrap; align-items:center;">
+      <div class="about-text" style="flex:1 1 320px;">
+        <p class="section-label">Our story</p>
+        <h2 class="section-title">BORN FROM THE <span class="neon-red">GRIDDLE</span></h2>
+        <p>It started with a cast iron skillet and one simple rule: smash it hard, cook it fast, never look back.</p>
+        <p>We took the classic smash technique — high heat, maximum crust, perfect caramelization — and made it the whole religion. No shortcuts, no freezer patties, no gimmicks. Just fresh-ground beef, a screaming hot flat-top, and a whole lot of pressure.</p>
+        <p>Every burger leaves that griddle with crispy, lacy edges and a juicy center that'll have you ordering a second before you're done with your first.</p>
+        <a href="#menu" class="btn btn-primary" style="margin-top:8px;">Smash One Now</a>
+      </div>
+      <div class="about-visual">
+        <div class="stat-box">
+          <div class="num neon-yellow">100%</div>
+          <div class="lbl">Fresh Beef</div>
+        </div>
+        <div class="stat-box">
+          <div class="num neon-red">700°</div>
+          <div class="lbl">Griddle Temp</div>
+        </div>
+        <div class="stat-box">
+          <div class="num neon-red">0</div>
+          <div class="lbl">Frozen Patties</div>
+        </div>
+        <div class="stat-box">
+          <div class="num neon-yellow">∞</div>
+          <div class="lbl">Smash Power</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SPECIALS -->
+  <section id="specials">
+    <div class="container">
+      <p class="section-label">Every week, without fail</p>
+      <h2 class="section-title">WEEKLY <span class="neon-red">SPECIALS</span></h2>
+      <p class="subtitle">Because every day deserves a reason to smash.</p>
+      <div class="specials-grid">
+        <div class="special-card" data-day="MON">
+          <h3>Manic Monday</h3>
+          <p>Buy any single smash, get a second for $1. Stack 'em high.</p>
+        </div>
+        <div class="special-card" data-day="WED">
+          <h3>Hump Smash</h3>
+          <p>All double smashes are $2 off. Peak of the week, peak of the burger.</p>
+        </div>
+        <div class="special-card" data-day="FRI">
+          <h3>Fry Day Frenzy</h3>
+          <p>Free loaded fries with any combo order. Every Friday. No exceptions.</p>
+        </div>
+        <div class="special-card" data-day="SUN">
+          <h3>Sunday Meltdown</h3>
+          <p>The Meltdown burger — triple smash — is just $10 all day Sunday.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- LOCATION & HOURS -->
+  <section id="location" style="padding: 96px 24px;">
+    <div class="container" style="display:flex; gap:64px; flex-wrap:wrap; align-items:flex-start;">
+      <div class="loc-info" style="flex:1 1 240px;">
+        <p class="section-label">Come get smashed</p>
+        <h2 class="section-title">FIND <span class="neon-yellow">US</span></h2>
+        <p>📍 20464 Devonshire St<br>Chatsworth, CA 91311</p>
+        <p>📞 818.482.9364</p>
+        <p>📧 hello@smashemburgers.com</p>
+        <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap;">
+          <a href="#" class="btn btn-outline" style="padding:9px 18px; font-size:0.75rem;">Instagram</a>
+          <a href="#" class="btn btn-outline" style="padding:9px 18px; font-size:0.75rem;">TikTok</a>
+        </div>
+      </div>
+      <div class="hours-table" style="flex:1 1 240px;">
+        <h3>HOURS</h3>
+        <div class="hours-row"><span class="day">Monday</span><span class="time">11am – 9pm</span></div>
+        <div class="hours-row"><span class="day">Tuesday</span><span class="time">11am – 9pm</span></div>
+        <div class="hours-row"><span class="day">Wednesday</span><span class="time">11am – 9pm</span></div>
+        <div class="hours-row"><span class="day">Thursday</span><span class="time">11am – 9pm</span></div>
+        <div class="hours-row"><span class="day">Friday</span><span class="time">11am – 11pm</span></div>
+        <div class="hours-row"><span class="day">Saturday</span><span class="time">10am – 11pm</span></div>
+        <div class="hours-row"><span class="day">Sunday</span><span class="time">10am – 9pm</span></div>
+      </div>
+      <div style="flex:2 1 340px; border-radius:8px; overflow:hidden; border:1px solid #242424; height:280px;">
+        <iframe
+          src="https://maps.google.com/maps?q=20464+Devonshire+St,+Chatsworth,+CA+91311&t=&z=15&ie=UTF8&iwloc=&output=embed"
+          width="100%" height="100%" style="border:0; display:block; filter:grayscale(1) invert(0.9) contrast(0.85);"
+          allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          title="Smash 'em Burgers location"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CATERING -->
+  <section id="catering">
+    <div class="container">
+      <p class="section-label">Feed the whole crew</p>
+      <h2 class="section-title">CATERING <span class="neon-yellow">&amp; EVENTS</span></h2>
+      <p class="catering-intro">Birthdays, corporate events, backyard blowouts — we bring the flat-top to you. Minimum 20 guests.</p>
+
+      <div class="catering-wrap">
+
+        <!-- Perks -->
+        <div class="catering-perks">
+          <div class="perk">
+            <div class="perk-icon">🔥</div>
+            <div class="perk-text">
+              <h4>Live Flat-Top Setup</h4>
+              <p>We bring the full griddle experience on-site. Fresh smashes made to order in front of your guests.</p>
+            </div>
+          </div>
+          <div class="perk">
+            <div class="perk-icon">🍔</div>
+            <div class="perk-text">
+              <h4>Custom Menu Packages</h4>
+              <p>Choose from Classic, Premium, or Full Spread packages. Sides, drinks, and desserts available.</p>
+            </div>
+          </div>
+          <div class="perk">
+            <div class="perk-icon">📍</div>
+            <div class="perk-text">
+              <h4>We Come to You</h4>
+              <p>Serving the greater LA area. Setup and breakdown included — you just show up hungry.</p>
+            </div>
+          </div>
+          <div class="perk">
+            <div class="perk-icon">👥</div>
+            <div class="perk-text">
+              <h4>20 to 500+ Guests</h4>
+              <p>From intimate gatherings to stadium-sized events. We scale to your headcount.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <div class="catering-form">
+          <h3>Request a Quote</h3>
+          <form id="catering-form-el" onsubmit="handleCateringSubmit(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ct-name">Your Name</label>
+                <input type="text" id="ct-name" placeholder="Jane Smith" required />
+              </div>
+              <div class="form-group">
+                <label for="ct-email">Email</label>
+                <input type="email" id="ct-email" placeholder="jane@email.com" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ct-phone">Phone</label>
+                <input type="tel" id="ct-phone" placeholder="(818) 000-0000" />
+              </div>
+              <div class="form-group">
+                <label for="ct-guests">Guest Count</label>
+                <select id="ct-guests" required>
+                  <option value="" disabled selected>Select range</option>
+                  <option>20–50 guests</option>
+                  <option>50–100 guests</option>
+                  <option>100–200 guests</option>
+                  <option>200–500 guests</option>
+                  <option>500+ guests</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ct-date">Event Date</label>
+                <input type="date" id="ct-date" required />
+              </div>
+              <div class="form-group">
+                <label for="ct-type">Event Type</label>
+                <select id="ct-type">
+                  <option value="" disabled selected>Select type</option>
+                  <option>Birthday Party</option>
+                  <option>Corporate Event</option>
+                  <option>Wedding / Reception</option>
+                  <option>School / Fundraiser</option>
+                  <option>Backyard BBQ</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="flex:1 1 100%;">
+              <label for="ct-notes">Additional Details</label>
+              <textarea id="ct-notes" placeholder="Location, dietary needs, special requests..."></textarea>
+            </div>
+            <button type="submit" class="form-submit">Send Catering Request</button>
+            <p class="form-note">We'll get back to you within 24 hours · 818.482.9364</p>
+          </form>
+          <div id="catering-success" style="display:none; text-align:center; padding:40px 20px;">
+            <div style="font-size:2.5rem; margin-bottom:16px;">🔥</div>
+            <h3 style="font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:2px; color:var(--yellow); margin-bottom:10px;">Request Sent!</h3>
+            <p style="color:#666; font-size:0.85rem; line-height:1.7;">Thanks! We'll be in touch within 24 hours to talk smash.<br>Questions? Call us at 818.482.9364.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <img src="Logo.PNG" alt="Smash 'em Burgers" />
+    <div class="footer-links">
+      <a href="#menu">Menu</a>
+      <a href="#about">About</a>
+      <a href="#specials">Specials</a>
+      <a href="#location">Location</a>
+      <a href="#catering">Catering</a>
+      <a href="#">Instagram</a>
+      <a href="#">TikTok</a>
+    </div>
+    <p>&copy; 2026 Smash 'em Burgers — All rights reserved.</p>
+    <p style="margin-top:8px; color:#1a1a1a;">Smashed with love on a very hot griddle.</p>
+  </footer>
+
+  <script>
+    // ════════════════════════════════════════════════
+    //   NAV: add .scrolled when not at very top
+    // ════════════════════════════════════════════════
+    const mainNav = document.getElementById('main-nav');
+    window.addEventListener('scroll', () => {
+      mainNav.classList.toggle('scrolled', window.scrollY > 40);
+    }, { passive: true });
+
+    // ════════════════════════════════════════════════
+    //   MENU TABS
+    // ════════════════════════════════════════════════
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+
+    // ════════════════════════════════════════════════
+    //   TODAY IN HOURS
+    // ════════════════════════════════════════════════
+    const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const todayName = DAYS[new Date().getDay()];
+    document.querySelectorAll('.hours-row').forEach(row => {
+      const d = row.querySelector('.day');
+      if (d && d.textContent.trim() === todayName) {
+        row.classList.add('today');
+        d.textContent += ' ✦';
+      }
+    });
+
+    // ════════════════════════════════════════════════
+    //   IMAGE SEQUENCE SCROLL ANIMATION
+    // ════════════════════════════════════════════════
+
+    const FIRST_FRAME  = 1;
+    const LAST_FRAME   = 129;
+    const FRAME_COUNT  = LAST_FRAME - FIRST_FRAME + 1; // 129
+
+    // Path from assets/ folder to webp-burger/
+    const FRAME_BASE   = 'webp-burger/ezgif-frame-';
+
+    const seqCanvas    = document.getElementById('seq-canvas');
+    const ctx          = seqCanvas.getContext('2d');
+    const seqSection   = document.getElementById('sequence-section');
+    const scrollInd    = document.getElementById('scroll-indicator');
+    const loadOverlay  = document.getElementById('loading-overlay');
+    const progressFill = document.getElementById('progress-fill');
+    const loadingPct   = document.getElementById('loading-pct');
+
+    const beatEls = [
+      document.getElementById('beat-a'),
+      document.getElementById('beat-b'),
+      document.getElementById('beat-c'),
+      document.getElementById('beat-d'),
+    ];
+
+    // Beat scroll ranges [start, end] as fraction 0–1
+    const BEAT_RANGES = [
+      [0.00, 0.22],  // A — exploded hero
+      [0.27, 0.50],  // B — layers converging
+      [0.53, 0.73],  // C — nearly stacked
+      [0.78, 1.00],  // D — assembled, CTA
+    ];
+
+    // ── Canvas sizing ──
+    function resizeCanvas() {
+      seqCanvas.width  = seqCanvas.clientWidth  * window.devicePixelRatio;
+      seqCanvas.height = seqCanvas.clientHeight * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      if (lastDrawnImg) drawFrame(lastDrawnImg);
+    }
+
+    // ── Draw a single frame with "contain" fit ──
+    let lastDrawnImg = null;
+    function drawFrame(img) {
+      const vw = seqCanvas.clientWidth;
+      const vh = seqCanvas.clientHeight;
+      ctx.clearRect(0, 0, vw, vh);
+      const scale = Math.min(vw / img.naturalWidth, vh / img.naturalHeight);
+      const w = img.naturalWidth  * scale;
+      const h = img.naturalHeight * scale;
+      const x = (vw - w) / 2;
+      const y = (vh - h) / 2;
+      ctx.drawImage(img, x, y, w, h);
+      lastDrawnImg = img;
+    }
+
+    window.addEventListener('resize', resizeCanvas, { passive: true });
+    resizeCanvas();
+
+    // ── Preload all frames ──
+    const frames = new Array(FRAME_COUNT).fill(null);
+    let loadedCount = 0;
+    let allLoaded   = false;
+
+    frames.forEach((_, i) => {
+      const frameNum = FIRST_FRAME + i;
+      const img      = new Image();
+      const padded   = String(frameNum).padStart(3, '0');
+      img.src        = `${FRAME_BASE}${padded}.webp`;
+
+      img.onload = () => {
+        frames[i] = img;
+        loadedCount++;
+        const pct = loadedCount / FRAME_COUNT;
+        progressFill.style.width  = `${(pct * 100).toFixed(1)}%`;
+        loadingPct.textContent    = `${Math.round(pct * 100)}%`;
+
+        // Draw the very first frame as soon as it's available
+        if (frameNum === FIRST_FRAME && !lastDrawnImg) {
+          drawFrame(img);
+          // also prime beat A visible immediately
+          beatEls[0].style.opacity   = '1';
+          beatEls[0].style.transform = 'translateY(0)';
+        }
+
+        if (loadedCount === FRAME_COUNT) {
+          allLoaded = true;
+          setTimeout(() => loadOverlay.classList.add('done'), 500);
+        }
+      };
+
+      img.onerror = () => { loadedCount++; }; // skip missing frames gracefully
+    });
+
+    // ── Beat opacity helper ──
+    function beatOpacity(progress, start, end) {
+      const FADE = 0.065;
+      if (progress <= start || progress >= end) return 0;
+      if (progress < start + FADE) return (progress - start) / FADE;
+      if (progress > end   - FADE) return (end - progress)   / FADE;
+      return 1;
+    }
+
+    // ── Scroll handler ──
+    let rafPending    = false;
+    let lastProgress  = -1;
+
+    function getProgress() {
+      const totalScroll = seqSection.offsetHeight - window.innerHeight;
+      const scrolled    = window.scrollY;
+      return Math.min(Math.max(scrolled / totalScroll, 0), 1);
+    }
+
+    function tick() {
+      rafPending = false;
+
+      const progress = getProgress();
+      if (Math.abs(progress - lastProgress) < 0.0001) return;
+      lastProgress = progress;
+
+      // ── Frame ──
+      if (allLoaded) {
+        const idx = Math.min(
+          Math.floor(progress * (FRAME_COUNT - 1)),
+          FRAME_COUNT - 1
+        );
+        const img = frames[idx];
+        if (img) drawFrame(img);
+      }
+
+      // ── Scroll indicator ──
+      scrollInd.style.opacity = progress < 0.06
+        ? (1 - progress / 0.06).toFixed(3)
+        : '0';
+
+      // ── Beats ──
+      beatEls.forEach((el, i) => {
+        const [s, e] = BEAT_RANGES[i];
+        const op     = beatOpacity(progress, s, e);
+        // y: enters from +20, exits to -20
+        const entering = progress < s + 0.065;
+        const yOff     = op < 0.999
+          ? (entering ? (1 - op) * 22 : -(1 - op) * 22)
+          : 0;
+        el.style.opacity   = op.toFixed(4);
+        el.style.transform = `translateY(${yOff.toFixed(2)}px)`;
+      });
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!rafPending) {
+        rafPending = true;
+        requestAnimationFrame(tick);
+      }
+    }, { passive: true });
+
+    // Run once so beat A shows on load
+    requestAnimationFrame(tick);
+
+    // ════════════════════════════════════════════════
+    //   CATERING FORM
+    // ════════════════════════════════════════════════
+    async function handleCateringSubmit(e) {
+      e.preventDefault();
+
+      const btn = e.target.querySelector('.form-submit');
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+
+      const fullName = document.getElementById('ct-name').value.trim();
+      const nameParts = fullName.split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName  = nameParts.slice(1).join(' ') || '';
+
+      const payload = {
+        firstName,
+        lastName,
+        name:       fullName,
+        email:      document.getElementById('ct-email').value.trim(),
+        phone:      document.getElementById('ct-phone').value.trim(),
+        guestCount: document.getElementById('ct-guests').value,
+        eventDate:  document.getElementById('ct-date').value,
+        eventType:  document.getElementById('ct-type').value,
+        notes:      document.getElementById('ct-notes').value.trim(),
+        source:     'Smash em Burgers — Catering Form',
+      };
+
+      try {
+        await fetch('https://services.leadconnectorhq.com/hooks/kzez3CctqesZXtVGYr49/webhook-trigger/9ac48a4a-ea7b-42e2-81b4-6b3d744f3f8c', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(payload),
+        });
+      } catch (_) {
+        // Network errors are silent — GHL still usually receives the request.
+        // We always show success to avoid confusing the user.
+      }
+
+      document.getElementById('catering-form-el').style.display = 'none';
+      document.getElementById('catering-success').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
