@@ -211,8 +211,8 @@
     .beat-right .beat-sub { margin-left: auto; }
 
     /* CTA inside last beat */
+    .beat-btns { margin-top: 32px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
     .beat-btn {
-      margin-top: 32px;
       display: inline-block;
       padding: 14px 44px;
       border: 1.5px solid var(--yellow);
@@ -225,6 +225,7 @@
       pointer-events: auto;
       transition: background 0.2s, color 0.2s, box-shadow 0.2s;
     }
+    .beat-btn-solid { background: var(--red); border-color: var(--red); color: #fff; }
     .beat-btn:hover {
       background: var(--yellow);
       color: #000;
@@ -287,6 +288,12 @@
       margin-bottom: 48px;
     }
     .container { max-width: 1100px; margin: 0 auto; }
+
+    /* ── ORDER ONLINE ── */
+    #order { padding: 72px 24px; text-align: center; scroll-margin-top: 40px; }
+    #order .section-title { margin-bottom: 32px; }
+    .order-links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn.nav-order-mobile { display: none; }
 
     /* ── MENU ── */
     #menu { background: var(--dark); }
@@ -583,9 +590,18 @@
     .btn-outline:hover { background: rgba(255,210,0,0.07); box-shadow: 0 0 20px rgba(255,210,0,0.4); }
 
     /* ── RESPONSIVE ── */
-    @media (max-width: 680px) {
+    @media (max-width: 1080px) {
+      nav { padding: 16px 24px; }
+      nav ul { gap: 18px; }
+      nav ul a { font-size: 0.7rem; letter-spacing: 1px; white-space: nowrap; }
+    }
+    @media (max-width: 900px) {
       nav ul { display: none; }
+      .btn.nav-order-mobile { display: inline-block; padding: 10px 20px; font-size: 0.78rem; }
+    }
+    @media (max-width: 680px) {
       nav { padding: 14px 20px; }
+      .order-links .btn { width: 100%; max-width: 320px; }
       .beat h2 { font-size: clamp(3rem, 14vw, 5rem); }
       .beat-center { padding: 80px 8%; }
     }
@@ -605,8 +621,10 @@
       <li><a href="#specials">Specials</a></li>
       <li><a href="#location">Find Us</a></li>
       <li><a href="#catering">Catering</a></li>
-      <li><a href="#catering" class="nav-cta">Contact Us</a></li>
+      <li><a href="#catering">Contact Us</a></li>
+      <li><a href="#order" class="nav-cta">Order Online</a></li>
     </ul>
+    <a href="#order" class="btn btn-primary nav-order-mobile">Order</a>
   </nav>
 
   <!-- LOADING OVERLAY -->
@@ -648,8 +666,11 @@
       <!-- Beat D: 78–100% — Fully assembled -->
       <div class="beat beat-center" id="beat-d">
         <h2>READY<br>TO <span class="accent-red">SMASH?</span></h2>
-        <p class="beat-sub">Find us just east of Mason Ave — open daily</p>
-        <a href="#catering" class="beat-btn">Contact Us</a>
+        <p class="beat-sub">Find us in Canoga Park — open daily</p>
+        <div class="beat-btns">
+          <a href="#order" class="beat-btn beat-btn-solid">Order Online</a>
+          <a href="#catering" class="beat-btn">Contact Us</a>
+        </div>
       </div>
 
       <!-- Scroll indicator -->
@@ -660,6 +681,20 @@
 
     </div>
   </div>
+
+  <div class="divider"></div>
+
+  <!-- ORDER ONLINE -->
+  <section id="order">
+    <div class="container">
+      <p class="section-label">Get it delivered</p>
+      <h2 class="section-title">ORDER <span class="neon-yellow">ONLINE</span></h2>
+      <div class="order-links">
+        <a href="https://www.doordash.com/store/smashem-burgers-canoga-park-52524103/124342367/" target="_blank" rel="noopener" class="btn btn-primary">Order on DoorDash</a>
+        <a href="https://www.ubereats.com/store/smash-em-burger/AiEMduArWFKUBIj5vRh4cA" target="_blank" rel="noopener" class="btn btn-outline">Order on Uber Eats</a>
+      </div>
+    </div>
+  </section>
 
   <div class="divider"></div>
 
@@ -794,11 +829,13 @@
       <div class="loc-info" style="flex:1 1 240px;">
         <p class="section-label">Come get smashed</p>
         <h2 class="section-title">FIND <span class="neon-yellow">US</span></h2>
-        <p>📍 20464 Devonshire St<br>Chatsworth, CA 91311</p>
+        <p>📍 9030 Owensmouth Ave<br>Canoga Park, CA 91304-1416</p>
         <p>📞 818.482.9364</p>
         <p>📧 hello@smashemburgers.com</p>
         <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap;">
           <a href="https://www.instagram.com/smashem_burgers/" target="_blank" rel="noopener" class="btn btn-outline" style="padding:9px 18px; font-size:0.75rem;">Instagram</a>
+          <a href="https://www.doordash.com/store/smashem-burgers-canoga-park-52524103/124342367/" target="_blank" rel="noopener" class="btn btn-outline" style="padding:9px 18px; font-size:0.75rem;">DoorDash</a>
+          <a href="https://www.ubereats.com/store/smash-em-burger/AiEMduArWFKUBIj5vRh4cA" target="_blank" rel="noopener" class="btn btn-outline" style="padding:9px 18px; font-size:0.75rem;">Uber Eats</a>
         </div>
       </div>
       <div class="hours-table" style="flex:1 1 240px;">
@@ -813,7 +850,7 @@
       </div>
       <div style="flex:2 1 340px; border-radius:8px; overflow:hidden; border:1px solid #242424; height:280px;">
         <iframe
-          src="https://maps.google.com/maps?q=20464+Devonshire+St,+Chatsworth,+CA+91311&t=&z=15&ie=UTF8&iwloc=&output=embed"
+          src="https://maps.google.com/maps?q=9030+Owensmouth+Ave,+Canoga+Park,+CA+91304-1416&t=&z=15&ie=UTF8&iwloc=&output=embed"
           width="100%" height="100%" style="border:0; display:block; filter:grayscale(1) invert(0.9) contrast(0.85);"
           allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
           title="Smash 'em Burgers location"></iframe>
@@ -941,6 +978,8 @@
       <a href="#location">Location</a>
       <a href="#catering">Catering</a>
       <a href="https://www.instagram.com/smashem_burgers/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.doordash.com/store/smashem-burgers-canoga-park-52524103/124342367/" target="_blank" rel="noopener">DoorDash</a>
+      <a href="https://www.ubereats.com/store/smash-em-burger/AiEMduArWFKUBIj5vRh4cA" target="_blank" rel="noopener">Uber Eats</a>
     </div>
     <p>&copy; 2026 Smash 'em Burgers — All rights reserved.</p>
     <p style="margin-top:8px; color:#1a1a1a;">Smashed with love on a very hot griddle.</p>
