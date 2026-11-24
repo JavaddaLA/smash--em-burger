@@ -399,6 +399,8 @@
     #specials .subtitle { color: #555; font-size: 0.88rem; margin-bottom: 44px; letter-spacing: 1px; }
     .specials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; text-align: left; }
     .special-card {
+      display: flex;
+      flex-direction: column;
       border: 1px solid var(--red);
       border-radius: 8px;
       padding: 26px;
@@ -420,6 +422,9 @@
     }
     .special-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; color: var(--red); letter-spacing: 1px; margin-bottom: 8px; }
     .special-card p { font-size: 0.82rem; color: #777; line-height: 1.65; }
+    .special-links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: auto; padding-top: 18px; }
+    .special-links .btn { padding: 10px 14px; font-size: 0.7rem; letter-spacing: 1px; }
+    .specials-note { color: #777; font-size: 0.75rem; margin-top: 28px; }
 
     /* ── LOCATION ── */
     #location { background: var(--black); }
@@ -797,27 +802,42 @@
   <!-- SPECIALS -->
   <section id="specials">
     <div class="container">
-      <p class="section-label">Every week, without fail</p>
-      <h2 class="section-title">WEEKLY <span class="neon-red">SPECIALS</span></h2>
-      <p class="subtitle">Because every day deserves a reason to smash.</p>
+      <p class="section-label">Right now on delivery</p>
+      <h2 class="section-title">ONLINE <span class="neon-red">SPECIALS</span></h2>
+      <p class="subtitle">Tap your app to go straight to the deal.</p>
       <div class="specials-grid">
-        <div class="special-card" data-day="MON">
-          <h3>Manic Monday</h3>
-          <p>Buy any single smash, get a second for $1. Stack 'em high.</p>
+        <div class="special-card" data-day="BOGO">
+          <h3>Single Smash</h3>
+          <p>Buy one Single Smash, get one free. Two for $13.00.</p>
+          <div class="special-links">
+            <a href="https://www.doordash.com/store/smashem-burgers-canoga-park-52524103/item/44798264791/" target="_blank" rel="noopener" class="btn btn-primary" aria-label="Single Smash on DoorDash">DoorDash</a>
+            <a href="https://www.ubereats.com/store/smash-em-burger/AiEMduArWFKUBIj5vRh4cA/adca5031-d570-5f76-9e76-d0b8ae9d68e2/9aa6e901-bd6b-5812-936b-d7993fb7396b/7b1a250d-4356-5086-aeab-52d13b5f4e04" target="_blank" rel="noopener" class="btn btn-outline" aria-label="Single Smash on Uber Eats">Uber Eats</a>
+          </div>
         </div>
-        <div class="special-card" data-day="WED">
-          <h3>Hump Smash</h3>
-          <p>All double smashes are $2 off. Peak of the week, peak of the burger.</p>
+        <div class="special-card" data-day="BOGO">
+          <h3>Double Smash Combo</h3>
+          <p>Buy one combo, get one free. Double Smash, regular fries and a drink. Two for $22.10.</p>
+          <div class="special-links">
+            <a href="https://www.doordash.com/store/smashem-burgers-canoga-park-52524103/item/44798264795/" target="_blank" rel="noopener" class="btn btn-primary" aria-label="Double Smash Combo on DoorDash">DoorDash</a>
+            <a href="https://www.ubereats.com/store/smash-em-burger/AiEMduArWFKUBIj5vRh4cA/adca5031-d570-5f76-9e76-d0b8ae9d68e2/62bcd62b-5ff4-533a-ac70-95f0d9a0b29b/da02ccb0-2b4c-5ac4-98fd-3748201bd3aa" target="_blank" rel="noopener" class="btn btn-outline" aria-label="Double Smash Combo on Uber Eats">Uber Eats</a>
+          </div>
         </div>
-        <div class="special-card" data-day="FRI">
-          <h3>Fry Day Frenzy</h3>
-          <p>Free loaded fries with any combo order. Every Friday. No exceptions.</p>
+        <div class="special-card" data-day="BOGO">
+          <h3>Double Smash</h3>
+          <p>Buy one Double Smash, get one free. Two for $15.60. Only on DoorDash.</p>
+          <div class="special-links">
+            <a href="https://www.doordash.com/store/smashem-burgers-canoga-park-52524103/item/44798264792/" target="_blank" rel="noopener" class="btn btn-primary" aria-label="Double Smash on DoorDash">DoorDash</a>
+          </div>
         </div>
-        <div class="special-card" data-day="SUN">
-          <h3>Sunday Meltdown</h3>
-          <p>The Meltdown burger — triple smash — is just $10 all day Sunday.</p>
+        <div class="special-card" data-day="FREE">
+          <h3>Free Regular Fries</h3>
+          <p>Free regular fries when you spend $24 or more. Only on Uber Eats.</p>
+          <div class="special-links">
+            <a href="https://www.ubereats.com/store/smash-em-burger/AiEMduArWFKUBIj5vRh4cA/adca5031-d570-5f76-9e76-d0b8ae9d68e2/8d9f9e7b-fa0c-5750-95f2-dd6958d0b3a3/0a717293-2f4c-5298-b487-c098ac379823" target="_blank" rel="noopener" class="btn btn-outline" aria-label="Free Regular Fries on Uber Eats">Uber Eats</a>
+          </div>
         </div>
       </div>
+      <p class="specials-note">Offers and prices are set on each app and may change. Fees and taxes may apply.</p>
     </div>
   </section>
 
