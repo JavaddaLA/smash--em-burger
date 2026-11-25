@@ -391,6 +391,7 @@
       text-align: center;
     }
     .stat-box .num { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; line-height: 1; }
+    .stat-burger { width: 1em; height: 1em; display: block; margin: 0 auto; filter: drop-shadow(0 0 4px rgba(255,210,0,0.5)); }
     .stat-box .lbl { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #555; margin-top: 6px; }
 
     /* ── SPECIALS ── */
@@ -790,7 +791,14 @@
           <div class="lbl">Frozen Patties</div>
         </div>
         <div class="stat-box">
-          <div class="num neon-yellow">∞</div>
+          <div class="num neon-yellow">
+            <svg class="stat-burger" viewBox="0 0 48 48" aria-hidden="true">
+              <path fill="currentColor" d="M5 20C5 11 13 6 24 6s19 5 19 14a1.5 1.5 0 0 1-1.5 1.5h-35A1.5 1.5 0 0 1 5 20Z"/>
+              <path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M5 26.5l5 2.5 5-2.5 5 2.5 4.5-2.5 4.5 2.5 4.5-2.5 5 2.5 4.5-2.5"/>
+              <rect x="4" y="31.5" width="40" height="4" rx="2" fill="var(--red)"/>
+              <path fill="currentColor" d="M5 38h38c0 4-2.5 6-6 6H11c-3.5 0-6-2-6-6Z"/>
+            </svg>
+          </div>
           <div class="lbl">Smash Power</div>
         </div>
       </div>
